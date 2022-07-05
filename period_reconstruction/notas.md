@@ -6,16 +6,18 @@ Cosas a probar usando feets:
 * Agarrar caca y agregarle puntos. Nos creemos que deja de ser caca? Para elegir caca, agarrar algo no clasificado como nada y que tenga bajo std. Samplear distintos niveles de caca.
 * Las observaciones están correlacionadas. Si sacás random, seguro no se pierde eso. Si sacás muchas observaciones juntas, hay más chances de romper algo. Fijate eso.
 
+Aclaraciones:
+* Y perr? A pensarlo, es tu tesina. Por ahora es 1 std del proceso gaussiano.
+* El clasificador ya hecho de JB de dónde lo robo? RandomForest de scikit, parametros del paper.
+
 # Para la próxima reunión
-Dudas:
 
-* Por qué LS no es determinista? Lo corro varias veces?
-* Y perr?
-* El clasificador ya hecho de JB de dónde lo robo?
+Cosas que hice:
+* Chequear que Lomb-Scargle sea determinista corriéndolo 1e5 veces.
+* Los dos notebooks.
 
-Dudas de código:
+Cosas que no hice:
+* Leer el paper de Lomb-Scargle.
+* Ajustar el intervalo en el que busco períodos (toy usando feets pelado).
 
-* OOP?
-* Estructura de archivos?
-* Estilo de un `.ipynb`?
-* Español? Inglés?
+# Notas de Reunión
