@@ -9,15 +9,20 @@ Cosas a probar usando feets:
 Aclaraciones:
 * Y perr? A pensarlo, es tu tesina. Por ahora es 1 std del proceso gaussiano.
 * El clasificador ya hecho de JB de dónde lo robo? RandomForest de scikit, parametros del paper.
-
+  
 # Para la próxima reunión
 
 Cosas que hice:
-* Chequear que Lomb-Scargle sea determinista corriéndolo 1e5 veces.
-* Los dos notebooks.
+* Probar sigma clipping asumiendo que fuera remove noise: https://feets.readthedocs.io/en/latest/api/feets.html#module-feets.preprocess
+* Aiuda con poner la clase aparte, no sé python elemental aparentemente.
+* Period Deterioration con subsamples sucesivos (e historial). Hice bien el monkeypatch? No entiendo. Parece que anda bien con feets sin modificar también.
+* Filter por SNR no agarra nada. Debo estar haciendo algo mal.
+* Sigma clipping de feets me anda mal.
 
 Cosas que no hice:
 * Leer el paper de Lomb-Scargle.
-* Ajustar el intervalo en el que busco períodos (toy usando feets pelado).
+* Elegir una estrella más amigable. Hace falta? Ya dio algo feliz.
+* Usar una caché para los notebooks.
 
 # Notas de Reunión
+* Qué borré para llegar a un pico de período con LS?
