@@ -14,13 +14,10 @@ Aclaraciones:
 
 Cosas que hice:
 * No me anda: carpyncho download-catalog b360 lc --out b360_lc.csv
+* Sospecho que Lomb-Scargle es recontra inestable en estos casos y lo unico que hicimos con min_obs fue replicar la forma de los datos originales.
+* Los graficos que me pidio Bruno, aunque sospecho que fue en vano.
 
 Cosas que no hice:
 * Hacer andar period reconstruction.
 
 # Notas de Reunión
-Para las naranjitas chequear pq hay 3 picos. (falla muy rapido?)
-Elegir otra estrella para reconstruction (elegi el ejemplo de la tesina de Juan).
-Para cada curva de bin PeriodLS calcular donde esta cada pico y los ratios entre picos (en x).
-En el grafico que binea por PeriodLS parecen ser todas curvas de una misma distribución. Por qué? Qué tienen en común todos los tipos de estrellas y todos los períodos? El instrumento? El procesamiento de datos que le hace Juan?
-Pregunta abierta: pq los de periodo mas largo tienen un pico antes?
