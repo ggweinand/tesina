@@ -1,8 +1,8 @@
 import pandas as pd
 
 tiles = [
-            "b206",
-        ]
+    "b206",
+]
 column = "avg_hjd"
 
 for tile in tiles:
