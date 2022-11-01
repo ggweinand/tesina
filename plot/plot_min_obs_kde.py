@@ -38,7 +38,10 @@ bin_labels = [
 ]
 
 df = df[df["median_hjd"] != -1]
-intervals = [bin_labels[idx] for idx in pd.qcut(df.median_hjd/df.PeriodLS, n_bins, labels=False)]
+intervals = [
+    bin_labels[idx]
+    for idx in pd.qcut(df.median_hjd / df.PeriodLS, n_bins, labels=False)
+]
 df = df.assign(med_hjd_div_period=intervals)
 
 # Parchazo para n_del.
