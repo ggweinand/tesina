@@ -11,9 +11,9 @@ tile_list = loader.list_tiles()
 n_steps = 20 + 1
 
 for ax, tile in zip(axs.flatten(), tile_list):
-    df = pd.read_csv(f"../data/period_synth_{tile}.csv")
+    df = pd.read_csv(f"../data/period_synth_george_{tile}.csv")
 
-    mse = np.zeros(n_steps)
+    squared_err = np.zeros(n_steps)
     count = np.zeros(n_steps)
     for id in df["id"]:
         period_catalog = df.loc[
@@ -24,22 +24,29 @@ for ax, tile in zip(axs.flatten(), tile_list):
                 (df["id"] == id) & (df["n_synth"] == n_synth), "period_ls"
             ].values
             if len(period_row):
-                mse[idx] += (period_row[0] - period_catalog) ** 2
+                squared_err[idx] += (period_row[0] - period_catalog) ** 2
                 count[idx] += 1
             else:
                 break
 
-    mse = np.divide(mse, count)
+    X, y = [], []
+    for idx, (err, cnt) in enumerate(zip(squared_err, count)):
+        if cnt:
+            X.append(2 * idx)
+            y.append(err / cnt)
 
-    ax.plot(np.linspace(0, 40, 21), mse)
+    ax.scatter(X, y)
     # sns.histplot(
     #     data=tile_df, ax=ax, x="cnt", hue="vs_type", palette="deep", legend=True
     # )
     # ax.set_xlim(left=-2)
     # ax.set_xlim(right=300)
+    ax.set_ylim((10**-4, 10**4))
     ax.set_xlabel("Points added by Gaussian Process")
     ax.set_ylabel("Period MSE")
     ax.set_yscale("log")
     ax.set_title(tile)
+
+fig.suptitle(f"Using GP from george")
 
 plt.show()
