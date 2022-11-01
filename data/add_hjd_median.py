@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 
 from catalog.catalog_loader import CatalogLoader
-from period_reconstruction.light_curve_sampler import LightCurveSampler
+from light_curve.light_curve_sampler import LightCurveSampler
 
 loader = CatalogLoader("../catalog")
 tile_list = loader.list_tiles()

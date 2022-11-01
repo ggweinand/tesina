@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from catalog.catalog_loader import CatalogLoader
-from period_reconstruction.light_curve import LightCurve
+from light_curve.light_curve import LightCurve
 from typing import Optional
 
 # Given a LightCurve plots the 95% confidence interval of the GP in one phase.
