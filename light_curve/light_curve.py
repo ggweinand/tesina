@@ -14,7 +14,14 @@ from light_curve.gp_wrapper import GPWrapper, GeorgeGPWrapper
 class LightCurve:
     """A class for manipulating light curves using hjd and periodic representations simulataneously."""
 
-    def __init__(self, lc: pd.DataFrame, period_catalog: float, id:int=-1, model:Optional[GPWrapper]=None, seed:int=999):
+    def __init__(
+        self,
+        lc: pd.DataFrame,
+        period_catalog: float,
+        id: int = -1,
+        model: Optional[GPWrapper] = None,
+        seed: int = 999,
+    ):
         self.period_catalog = period_catalog
         self.id = id
 

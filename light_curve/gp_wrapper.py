@@ -6,6 +6,7 @@ from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.gaussian_process.kernels import Matern, WhiteKernel
 from scipy.optimize import minimize
 
+
 class GPWrapper(ABC):
     """An abstract gaussian process regressor class."""
 
