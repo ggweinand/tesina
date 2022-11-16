@@ -1,6 +1,7 @@
 from joblib import dump, load
 from sklearn.ensemble import RandomForestClassifier
 
+
 class RFWrapper:
     """
     Wrapper for sklearn RandomForestClassifier using the parameters from:
@@ -14,6 +15,7 @@ class RFWrapper:
     for each tree is the log2 of the total number of features, and
     the minimum number of observations in each leaf is 2.
     """
+
     def __init__(self):
         self.model = RandomForestClassifier(
             n_estimators=500,
@@ -22,15 +24,15 @@ class RFWrapper:
             min_samples_leaf=2,
             # TODO: Fijate n_jobs para entrenar en paralelo.
         )
-    
+
     def fit(self, X, y):
         return self.model.fit(X, y)
-    
+
     def predict(self, X):
         return self.model.predict(X)
-    
-    def to_file(self, filename:str):
+
+    def to_file(self, filename: str):
         dump(value=self.model, filename=filename, compress=3)
-    
-    def from_file(self, filename:str):
+
+    def from_file(self, filename: str):
         self.model = load(filename=filename)

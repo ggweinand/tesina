@@ -3,7 +3,7 @@ import pandas as pd
 from catalog.catalog_loader import CatalogLoader
 
 loader = CatalogLoader("../catalog")
-tile_list = ["b216"]  # loader.list_tiles()
+tile_list = loader.list_tiles()
 df = pd.DataFrame()
 
 # List of features to keep, plus the target (vs_type). Based on:
