@@ -6,7 +6,7 @@ loader = CatalogLoader("../catalog")
 tile_list = loader.list_tiles()
 df = pd.DataFrame()
 
-# List of features to keep, plus the target (vs_type). Based on:
+# List of features to keep, plus the target (vs_type) and id. Based on:
 # Cabral, J. B., Ramos, F., Gurovich, S., & Granitto, P. M. (2020).
 # Automatic catalog of RR Lyrae from ∼14 million VVV light curves: How far can we go with traditional machine-learning?.
 # Astronomy & Astrophysics, 642, A58.
@@ -43,6 +43,7 @@ columns = [
     "Freq3_harmonics_rel_phase_2",
     "Freq3_harmonics_rel_phase_3",
     "Gskew",
+    "id",
     "LinearTrend",
     "MaxSlope",
     "Mean",
@@ -78,9 +79,7 @@ columns = [
 
 # Make a dataframe with features from all tiles.
 for tile in tile_list:
-    print(tile)
     tile_df = loader.get_features(tile)[columns]
-    print(tile_df.columns)
     df = df.append(tile_df)
 
 # Make a binary target (it either is a RR-Lyrae or not).
