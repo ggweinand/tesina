@@ -78,7 +78,7 @@ fs = feets.FeatureSpace(only=columns)
 for tile in tile_list:
     tile_features = catalog_loader.get_features(tile)
     tile_features = tile_features.assign(rrlyr=tile_features["vs_type"].isin(rr_lyrae))
-    tile_lc = augmented_loader.get_tile(tile)
+    tile_lc = augmented_loader.get_lc(tile)
 
     filtered_lc = tile_lc.loc[tile_lc["synthetic"] == False]
     for id in tile_lc["id"].unique():
