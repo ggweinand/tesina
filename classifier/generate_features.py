@@ -93,7 +93,7 @@ for tile in tile_list:
         names, values = fs.extract(
             star_lc["hjd"].values, star_lc["mag"].values, star_lc["err"].values
         )
-        
+
         rrlyr = tile_features[tile_features["id"] == id]["rrlyr"].values[0]
         lc_dict = dict(zip(names, values))
         lc_dict["id"] = id

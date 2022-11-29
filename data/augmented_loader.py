@@ -91,12 +91,14 @@ class AugmentedLoader:
 
     def get_lc(self, tile):
         return read_csv(
-            f"{self.path}/augmented_{tile}_{self.gp_lib}_snr20.csv", dtype=self._lc_dtype
+            f"{self.path}/augmented_{tile}_{self.gp_lib}_snr20.csv",
+            dtype=self._lc_dtype,
         )
-    
+
     def get_features(self, n_synth):
         return read_csv(
-            f"{self.path}/features_{self.gp_lib}_{n_synth}.csv", dtype=self._features_dtype
+            f"{self.path}/features_{self.gp_lib}_{n_synth}.csv",
+            dtype=self._features_dtype,
         )
 
     def list_tiles(self):

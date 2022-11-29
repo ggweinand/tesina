@@ -17,11 +17,11 @@ rr_lyrae = ["RRLyr-RRab", "RRLyr-RRc", "RRLyr-RRd"]
 features_df = features_df[features_df["vs_type"].isin(rr_lyrae)]
 lc_df = lc_df[lc_df.bm_src_id.isin(features_df.id.to_numpy())]
 
-file = open(f"period_synth_{tile}.csv", "w")
-file.write("id,n_obs,n_synth,period_catalog,period_ls,period_fit\n")
+file = open(f"period_synth_george_{tile}.csv", "w")
+file.write("id,n_synth,period_ls,period_fit\n")
 
 # Parameters
-n_iter = 20
+n_iter = 100
 n_add = 2
 
 augmented_lc = pd.DataFrame()
@@ -44,4 +44,4 @@ for _, star in features_df.iterrows():
             file.write(f"{lc.id},{len(lc.synth_hjd)},{period_ls},{period_fit}\n")
         augmented_lc = augmented_lc.append(lc.to_dataframe())
 
-augmented_lc.to_csv(f"augmented_{tile}_snr20.csv", index=False)
+augmented_lc.to_csv(f"augmented_{tile}_george_snr20.csv", index=False)

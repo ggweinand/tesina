@@ -43,7 +43,6 @@ columns = [
     "Freq3_harmonics_rel_phase_2",
     "Freq3_harmonics_rel_phase_3",
     "Gskew",
-    "id",
     "LinearTrend",
     "MaxSlope",
     "Mean",
@@ -61,12 +60,14 @@ columns = [
     "Skew",
     "SmallKurtosis",
     "Std",
+    "id",
     "vs_type",
 ]
 
 # Make a dataframe with features from all tiles.
 for tile in tile_list:
     tile_df = loader.get_features(tile)[columns]
+    tile_df = tile_df.assign(tile=tile)
     df = df.append(tile_df)
 
 # Make a binary target (it either is a RR-Lyrae or not).
