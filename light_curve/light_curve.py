@@ -33,11 +33,11 @@ class LightCurve:
         self.rng = np.random.default_rng(seed)
         self.discarded = []
 
-        lc = lc.sort_values("pwp_stack_src_mag3")
+        lc = lc.sort_values("mag")
         self.hjd, self.mag, self.err = (
-            lc.pwp_stack_src_hjd.values,
-            lc.pwp_stack_src_mag3.values,
-            lc.pwp_stack_src_mag_err3.values,
+            lc.hjd.values,
+            lc.mag.values,
+            lc.err.values,
         )
         self.orig_hjd = np.copy(self.hjd)
         self.orig_mag = np.copy(self.mag)
