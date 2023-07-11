@@ -2,9 +2,11 @@ from pandas import read_csv
 
 
 class AugmentedLoader:
-    def __init__(self, path, gp_lib):
+    def __init__(self, path, gp_lib, snr, n_synth):
         self.path = path
         self.gp_lib = gp_lib
+        self.snr = snr
+        self.n_synth = n_synth
         self._lc_dtype = {
             "err": "float64",
             "id": "int64",
@@ -91,13 +93,13 @@ class AugmentedLoader:
 
     def get_lc(self, tile):
         return read_csv(
-            f"{self.path}/augmented_{tile}_{self.gp_lib}_snr20.csv",
+            f"{self.path}/augmented_{tile}_{self.gp_lib}_lc_snr{self.snr}_synth{self.n_synth}.csv",
             dtype=self._lc_dtype,
         )
 
-    def get_features(self, n_synth):
+    def get_features(self, tile):
         return read_csv(
-            f"{self.path}/features_{self.gp_lib}_{n_synth}.csv",
+            f"{self.path}/augmented_{tile}_{self.gp_lib}_features_snr{self.snr}_synth{self.n_synth}.csv",
             dtype=self._features_dtype,
         )
 
