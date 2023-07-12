@@ -20,17 +20,19 @@ n_jobs = 10
 def generate_features(lc, features, fs):
     features_list = []
     for _, star in features.iterrows():
-        star_lc = lc.loc[lc["id"] == star.id]
-        names, values = fs.extract(
-            star_lc["hjd"].values, star_lc["mag"].values, star_lc["err"].values
-        )
+        try:
+            star_lc = lc.loc[lc["id"] == star.id]
+            names, values = fs.extract(
+                star_lc["hjd"].values, star_lc["mag"].values, star_lc["err"].values
+            )
+            lc_dict = dict(zip(names, values))
+            lc_dict["id"] = [star.id]
+            lc_dict["rrlyr"] = star.rrlyr
 
-        lc_dict = dict(zip(names, values))
-        lc_dict["id"] = [star.id]
-        lc_dict["rrlyr"] = star.rrlyr
-
-        star_df = pd.DataFrame.from_dict(lc_dict)
-        features_list.append(star_df)
+            star_df = pd.DataFrame.from_dict(lc_dict)
+            features_list.append(star_df)
+        except RuntimeError:
+            print(f"Caught RuntimeError with star id: {star.id}")
     return pd.concat(features_list)
 
 
