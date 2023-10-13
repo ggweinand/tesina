@@ -16,7 +16,6 @@ class AugmentedLoader:
         }
         self._features_dtype = {
             "id": "int64",
-            "tile": "str",
             "rrlyr": "bool",
             "Amplitude": "float64",
             "Autocor_length": "float64",

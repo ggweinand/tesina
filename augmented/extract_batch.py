@@ -15,9 +15,13 @@ gp_lib = "george"
 tile = "b278"
 snr = 20
 n_synth = int(sys.argv[1])
-n_jobs = 32
-start_idx = int(sys.argv[2])
-end_idx = int(sys.argv[3])
+n_jobs = 10
+batch_idx = int(sys.argv[2])
+n_batch = int(sys.argv[3])
+
+
+class TimeLimitError(Exception):
+    pass
 
 
 def generate_features(lc, features, fs):
@@ -40,11 +44,12 @@ def generate_features(lc, features, fs):
             print(f"Caught ZeroDivisonError with star id: {star.id}")
         except IndexError:
             print(f"Caught IndexError with star id: {star.id}")
+        except TimeLimitError:
+            print(f"Caught TimeLimitError with star id: {star.id}")
+
+        print(f"{star.id} END")
     return pd.concat(features_list)
 
-
-filtered_loader = FilteredLoader("../filtered")
-augmented_loader = AugmentedLoader(".", gp_lib, snr, n_synth)
 
 # List of features to keep, plus the target (vs_type). Based on:
 # Cabral, J. B., Ramos, F., Gurovich, S., & Granitto, P. M. (2020).
@@ -105,11 +110,17 @@ columns = [
 
 rr_lyrae = ["RRLyr-RRab", "RRLyr-RRc", "RRLyr-RRd"]
 
+filtered_loader = FilteredLoader("../filtered")
+augmented_loader = AugmentedLoader(".", gp_lib, snr, n_synth)
+
 tile_features = filtered_loader.get_features(tile, snr)
 tile_features = tile_features.assign(rrlyr=tile_features["vs_type"].isin(rr_lyrae))
 tile_lc = augmented_loader.get_lc(tile)
 
-tile_id = tile_lc["id"].unique()[start_idx:end_idx]
+tile_id = tile_lc["id"].unique()
+batch_id = np.array_split(tile_id, n_batch)
+tile_id = batch_id[batch_idx]
+
 chunk_id = np.array_split(tile_id, n_jobs)
 lc_chunks = [tile_lc[tile_lc["id"].isin(ids)] for ids in chunk_id]
 f_chunks = [tile_features[tile_features["id"].isin(ids)] for ids in chunk_id]
@@ -128,6 +139,6 @@ features_list = Parallel(n_jobs=n_jobs)(
 
 features_df = pd.concat(features_list)
 features_df.to_csv(
-    f"augmented_{tile}_{gp_lib}_features_snr{snr}_synth{n_synth}{start_idx}.csv",
+    f"augmented_{tile}_{gp_lib}_features_snr{snr}_synth{n_synth}_{batch_idx}.csv",
     index=False,
 )

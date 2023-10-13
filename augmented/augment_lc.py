@@ -25,4 +25,6 @@ for _, star in feature_df.iterrows():
     augmented_list.append(lc.to_dataframe())
 
 augmented_df = pd.concat(augmented_list)
-augmented_df.to_csv(f"augmented_{tile}_scikit_lc_snr{snr}_synth{n_iter*n_add}.csv", index=False)
+augmented_df.to_csv(
+    f"augmented_{tile}_scikit_lc_snr{snr}_synth{n_iter*n_add}.csv", index=False
+)
