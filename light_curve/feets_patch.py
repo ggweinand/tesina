@@ -58,7 +58,6 @@ def fap_error(
 
 @feets.register_extractor
 class LombScargleWithError(Extractor):
-
     data = ["magnitude", "time", "error"]
     features = ["PeriodLS", "Period_fit", "Psi_CS", "Psi_eta"]
     params = {
@@ -146,7 +145,6 @@ class LombScargleWithError(Extractor):
 
 @feets.register_extractor
 class FourierComponentsWithError(Extractor):
-
     data = ["magnitude", "time", "error"]
     features = [
         "Freq1_harmonics_amplitude_0",

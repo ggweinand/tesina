@@ -5,6 +5,7 @@ from catalog.catalog_loader import CatalogLoader
 from light_curve.light_curve import LightCurve
 from typing import Optional
 
+
 # Given a LightCurve plots the 95% confidence interval of the GP in one phase.
 def plot_gp(
     lc: LightCurve, fig: Optional[plt.Figure] = None, ax: Optional[plt.Axes] = None

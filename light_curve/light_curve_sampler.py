@@ -69,10 +69,10 @@ class LightCurveSampler:
     def to_dataframe(self):
         total_len = len(self.hjd)
         return pd.DataFrame.from_dict(
-                {
-                    "id": np.full(total_len, self.id),
-                    "hjd": self.hjd,
-                    "mag": self.mag,
-                    "err": self.err,
-                }
+            {
+                "id": np.full(total_len, self.id),
+                "hjd": self.hjd,
+                "mag": self.mag,
+                "err": self.err,
+            }
         )

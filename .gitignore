@@ -2,6 +2,12 @@
 papers
 books
 
+# Backup files
+*.bak
+
+# Compressed files
+*.tar.gz
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -15,6 +21,12 @@ catalog/*.csv
 plot/*.csv
 filtered/*.csv
 augmented/*.csv
+
+# joblib dumps
+classifier/*synth*
+
+# Plots in folders other than plot
+classifier/*.png
 
 # Distribution / packaging
 .Python
