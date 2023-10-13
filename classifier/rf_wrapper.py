@@ -16,13 +16,15 @@ class RFWrapper:
     the minimum number of observations in each leaf is 2.
     """
 
-    def __init__(self):
+    def __init__(self, n_jobs: int = 1, seed: int = 999):
         self.model = RandomForestClassifier(
             n_estimators=500,
             criterion="entropy",
             max_features="log2",
             min_samples_leaf=2,
-            # TODO: Fijate n_jobs para entrenar en paralelo.
+            oob_score=True,
+            n_jobs=n_jobs,
+            random_state=seed,
         )
 
     def fit(self, X, y):
@@ -30,6 +32,9 @@ class RFWrapper:
 
     def predict(self, X):
         return self.model.predict(X)
+
+    def predict_proba(self, X):
+        return self.model.predict_proba(X)
 
     def to_file(self, filename: str):
         dump(value=self.model, filename=filename, compress=3)
