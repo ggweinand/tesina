@@ -113,7 +113,15 @@ class CatalogLoader:
         ).iloc[:, 1:]
 
     def get_lc(self, tile):
-        return read_csv(f"{self.path}/{tile}_lc.csv", dtype=self._lc_dtype).iloc[:, 1:]
+        df = read_csv(f"{self.path}/{tile}_lc.csv", dtype=self._lc_dtype).iloc[:, 1:]
+        return df.rename(
+            columns={
+                "bm_src_id": "id",
+                "pwp_stack_src_hjd": "hjd",
+                "pwp_stack_src_mag3": "mag",
+                "pwp_stack_src_mag_err3": "err",
+            }
+        )
 
     def list_tiles(self):
         return self._tiles
