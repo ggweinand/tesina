@@ -1,10 +1,7 @@
 import numpy as np
-import numpy.typing as npt
 import pandas as pd
 
-from astropy.stats import biweight_location, biweight_scale
 from feets import FeatureSpace
-from feets.preprocess import remove_noise
 from PyAstronomy.pyasl import foldAt
 from typing import Optional
 
@@ -37,10 +34,10 @@ class LightCurve:
         self.mag = lc.mag.to_numpy()
         self.err = lc.err.to_numpy()
         self.synth = np.full_like(self.hjd, False, dtype=bool)
-        self.dirty = True
+        self.mean_mag = np.mean(self.mag)
+        self.dirty = False
 
-        self.background_level = biweight_location(self.mag)
-        self.fs = FeatureSpace(only=['PeriodLS', 'Period_fit'])
+        self.fs = FeatureSpace(only=["PeriodLS", "Period_fit"])
         self.period = period_catalog
 
         self._make_periodic()
@@ -48,25 +45,34 @@ class LightCurve:
     """Use Lomb-Scargle to obtain the period using the hjd representation."""
 
     def _calculate_period(self):
-         _, values = self.fs.extract(time=self.hjd, magnitude=self.mag, error=self.err)
-         return values[0], values[1]
+        _, values = self.fs.extract(time=self.hjd, magnitude=self.mag, error=self.err)
+        return values[0], values[1]
 
     """Generate the periodic representation with the current period and the hjd representation."""
 
     def _make_periodic(self):
         min_idx = self.mag.argmin()
         self.phase = foldAt(self.hjd, self.period, T0=self.hjd[min_idx])
-        self.background_level = biweight_location(self.mag)
-        self.dirty = False
+
+    """Update the periodic representation and mean magnitude."""
+
+    def update(self):
+        if self.dirty:
+            self.make_periodic()
+            self.mean_mag = np.mean(self.mag)
+            self.dirty = False
 
     """Train the model using the periodic representation."""
 
     def _train(self):
-        if self.dirty:
-            self.make_periodic()
+        self.update()
 
-        phase = self.phase.reshape(-1, 1)
-        self.model.fit(phase, self.mag - self.background_level, self.err)
+        # We use two phases to make sure that the gp models a periodic
+        # function.
+        phase = np.append(self.phase, self.phase + 1).reshape(-1, 1)
+        mag = np.append(self.mag, self.mag) - self.mean_mag
+        err = np.append(self.err, self.err)
+        self.model.fit(phase, mag, err)
 
     """Selects a hjd for synthetic observation generation."""
 
@@ -95,7 +101,7 @@ class LightCurve:
         hjd = self._select_hjd()
         phase = self._hjd_to_phase(hjd)
         mean, std = self.model.predict(np.reshape(phase, (-1, 1)), return_std=True)
-        self._add_hjd_observation(hjd, mean[0] + self.background_level, std[0])
+        self._add_hjd_observation(hjd, mean[0] + self.mean_mag, std[0])
 
     """
     Generates n_synthetic observations using a random hjd. pmag and perr are obtained from
@@ -142,17 +148,6 @@ class LightCurve:
         self.err = self.err[filtered]
         self.synth = self.synth[filtered]
 
-        self.background_level = biweight_location(self.mag)
-        self.dirty = True
-
-    """
-    Uses feets to remove noisy points using sigma clipping.
-    """
-
-    def filter_sigma_clipping(self):
-        self.hjd, self.mag, self.err = remove_noise(self.hjd, self.mag, self.err)
-        self.synth = np.full_like(self.hjd, True)
-        self.background_level = biweight_location(self.mag)
         self.dirty = True
 
     """
@@ -166,6 +161,6 @@ class LightCurve:
                 "hjd": self.hjd,
                 "mag": self.mag,
                 "err": self.err,
-                "synthetic": self.synth
+                "synthetic": self.synth,
             }
         )
