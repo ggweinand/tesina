@@ -1,22 +1,7 @@
-# Consigna(ish)
-Cosas a probar usando feets:
-
-* Agarrar caca y agregarle puntos. Nos creemos que deja de ser caca? Para elegir caca, agarrar algo no clasificado como nada y que tenga bajo std. Samplear distintos niveles de caca.
-* Las observaciones están correlacionadas. Si sacás random, seguro no se pierde eso. Si sacás muchas observaciones juntas, hay más chances de romper algo. Fijate eso.
-
 Aclaraciones:
 * Y perr? A pensarlo, es tu tesina. Por ahora es 1 std del proceso gaussiano.
 * El clasificador ya hecho de JB de dónde lo robo? RandomForest de scikit, parametros del paper.
 * Citar 4.1. A Non-uniform Nyquist Limit? del Paper de Jake (al tener uneven samples no hay )
-  
-# Para la próxima reunión
-
-Cosas que hice:
-* Subir todo lindo a Github.
-* Graficar bien mse tanto para scikit como jorge pelado y subir a slides.
-RR* Wrapper de RF.
-
-Cosas que no hice:
 
 # Notas de Reunión
 Agregale 1000 puntos a cada lc en vez de 40.
@@ -45,7 +30,3 @@ La pipeline es:
 Armar un df grande con las features de todas las tiles.
 A cada curva de luz aumentada recalcularle las features.
 Entrenar un RF con el df grande y estimar qué? ROC-AUC?
-
-Intentar hacer andar mcmc con jorge.
-
-Arreglar lo del overleaf.
