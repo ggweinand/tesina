@@ -21,6 +21,7 @@ catalog/*.csv
 plot/*.csv
 filtered/*.csv
 augmented/*.csv
+period/*.csv
 
 # joblib dumps
 classifier/*synth*
