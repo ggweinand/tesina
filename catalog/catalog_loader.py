@@ -1,4 +1,4 @@
-from pandas import read_csv
+from pandas import DataFrame, read_csv
 
 
 class CatalogLoader:
@@ -107,12 +107,12 @@ class CatalogLoader:
             "b396",
         ]
 
-    def get_features(self, tile):
+    def get_features(self, tile: str) -> DataFrame:
         return read_csv(
             f"{self.path}/{tile}_features.csv", dtype=self._features_dtype
         ).iloc[:, 1:]
 
-    def get_lc(self, tile):
+    def get_lc(self, tile) -> DataFrame:
         df = read_csv(f"{self.path}/{tile}_lc.csv", dtype=self._lc_dtype).iloc[:, 1:]
         return df.rename(
             columns={
