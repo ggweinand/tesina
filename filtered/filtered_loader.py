@@ -1,8 +1,8 @@
-from pandas import read_csv
+from pandas import DataFrame, read_csv
 
 
 class FilteredLoader:
-    def __init__(self, path):
+    def __init__(self, path: str):
         self.path = path
         self._features_dtype = {
             "id": "int64",
@@ -105,16 +105,14 @@ class FilteredLoader:
             "b396",
         ]
 
-    def get_features(self, tile, snr):
+    def get_features(self, tile: str) -> DataFrame:
         return read_csv(
-            f"{self.path}/filtered_{tile}_features_snr{snr}.csv",
+            f"{self.path}/filtered_{tile}_features.csv",
             dtype=self._features_dtype,
         )
 
-    def get_lc(self, tile, snr):
-        return read_csv(
-            f"{self.path}/filtered_{tile}_lc_snr{snr}.csv", dtype=self._lc_dtype
-        )
+    def get_lc(self, tile: str) -> DataFrame:
+        return read_csv(f"{self.path}/filtered_{tile}_lc.csv", dtype=self._lc_dtype)
 
     def list_tiles(self):
         return self._tiles

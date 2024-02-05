@@ -1,11 +1,16 @@
 from catalog.catalog_loader import CatalogLoader
-import pandas as pd
+from filtered.filtered_loader import FilteredLoader
+import sys
 
-tile = "b278"
-snr = 20
-loader = CatalogLoader("catalog")
-feature_df = loader.get_features(tile)
-lc_df = pd.read_csv(f"filtered_{tile}_lc_snr{snr}.csv")
+tile = sys.argv[1]
+catalog_loader = CatalogLoader("../catalog")
+filtered_loader = FilteredLoader(".")
+features = catalog_loader.get_features(tile)
+lc = filtered_loader.get_lc(tile)
 
-feature_df = feature_df.loc[feature_df["id"].isin(lc_df["id"].unique())]
-feature_df.to_csv(f"filtered_{tile}_features_snr{snr}.csv", index=False)
+features = features.loc[features["id"].isin(lc["id"].unique())]
+
+vc = lc.id.value_counts()
+features["cnt"] = features.apply(lambda x: vc[x["id"]], axis=1)
+
+features.to_csv(f"filtered_{tile}_features.csv", index=False)
