@@ -19,8 +19,8 @@ __pycache__/
 # CSV files in specific folders
 catalog/*.csv
 plot/*.csv
-filtered/*.csv
-augmented/*.csv
+filter/*.csv
+augment/*.csv
 period/*.csv
 
 # joblib dumps
