@@ -12,5 +12,6 @@ features = features.loc[features["id"].isin(lc["id"].unique())]
 
 vc = lc.id.value_counts()
 features["cnt"] = features.apply(lambda x: vc[x["id"]], axis=1)
+features = features[features["cnt"] >= 30]
 
 features.to_csv(f"filtered_{tile}_features.csv", index=False)
