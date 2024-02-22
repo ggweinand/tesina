@@ -1,18 +1,15 @@
-import numpy as np
-
 from filtered.filtered_loader import FilteredLoader
 from light_curve.light_curve_sampler import LightCurveSampler
-from joblib import Parallel, delayed
 from math import isclose
+from pandas import read_csv
 
 import sys
 
 # Parameters
 tile = sys.argv[1]
-n_jobs = 10
 
 
-def min_obs(lcs: LightCurveSampler):
+def min_obs(lcs: LightCurveSampler) -> int:
     """
     Removes observations at random from a star's light curve until the period is
     no longer obtainable. Then returns the smallest number for which it was.
@@ -30,40 +27,15 @@ def min_obs(lcs: LightCurveSampler):
     return min(n_sample + 1, n_obs)
 
 
-def batch_min_obs(lc_array):
-    """
-    Calls min_obs on every element of lc_array and returns the result in an array.
-    """
-    return np.array([min_obs(lc) for lc in lc_array])
+loader = FilteredLoader("../filter")
+lc = read_csv(f"rrlyr_{tile}_lc.csv", dtype=loader._lc_dtype)
+features = read_csv(f"rrlyr_{tile}_features.csv", dtype=loader._features_dtype)
 
+result = []
+for star in features.itertuples():
+    star_lc = lc[lc["id"] == star.id]
+    lcs = LightCurveSampler(star_lc, star.PeriodLS)
+    result.append(min_obs(lcs))
 
-# Load the DataFrames.
-loader = FilteredLoader("../filtered")
-lc = loader.get_lc(tile)
-features = loader.get_features(tile)
-
-# Keep the observations of RR-Lyrae stars.
-rr_lyrae = ["RRLyr-RRab", "RRLyr-RRc", "RRLyr-RRd"]
-features = features[features["vs_type"].isin(rr_lyrae)]
-lc = lc[lc.id.isin(features.id.to_numpy())]
-
-# Divide the data into chunks.
-id_chunk = np.array_split(features.id.to_numpy(), n_jobs)
-
-# Make the corresponding LightCurveSampler objects.
-lcs_chunk = []
-for ids in id_chunk:
-    lcs = []
-    for id in ids:
-        period = features[features["id"] == id].PeriodLS
-        l = lc[lc["id"] == id]
-        lcs.append(LightCurveSampler(l, period, id))
-    lcs_chunk.append(lcs)
-
-# Run the function for every chunk.
-result = Parallel(n_jobs=n_jobs)(delayed(batch_min_obs)(lcs) for lcs in lcs_chunk)
-
-# Join the result and save it to a file.
-result = np.concatenate(result)
-features["min_obs"] = result.tolist()
+features["min_obs"] = result
 features.to_csv(f"min_obs_{tile}.csv", index=False)
