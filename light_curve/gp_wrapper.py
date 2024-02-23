@@ -14,6 +14,7 @@ from scipy.optimize import minimize
 
 jax.config.update("jax_enable_x64", True)
 
+
 class GPWrapper(ABC):
     """An abstract gaussian process regressor class."""
 
@@ -33,25 +34,25 @@ class GPWrapper(ABC):
 class ScikitGPWrapper(GPWrapper, BaseEstimator, RegressorMixin):
     """A wrapper for the scikit_learn gaussian process regressor."""
 
-    def __init__(self, scale, length_scale):
-        self.scale = scale
+    def __init__(self, length_scale, period):
         self.length_scale = length_scale
-        self.period = 1
+        self.period = period
 
     def fit(self, X, y, y_err):
         self.mag_mean = np.mean(y)
         y = y - np.mean(y)
-        self.err_mean = np.mean(y_err)
-        y_err = y_err / self.err_mean
-        print(y_err)
 
-        kernel = np.exp(self.scale) * ExpSineSquared(np.exp(self.length_scale), self.period, periodicity_bounds="fixed")
+        # periodic kernel
+        length_scale = np.exp(self.length_scale)
+        period = np.exp(self.period)
+        kernel = ExpSineSquared(length_scale, period)
         self.gp = GaussianProcessRegressor(kernel=kernel, alpha=y_err**2)
         self.gp.fit(X, y)
 
         params = self.gp.kernel_.theta
-        self.scale = params[0] / 2
-        self.length_scale = params[1]
+        # TODO: Verify.
+        self.length_scale = params[0] / 2
+        self.period = params[1]
         self.is_fitted_ = True
 
         return self.gp
@@ -59,14 +60,15 @@ class ScikitGPWrapper(GPWrapper, BaseEstimator, RegressorMixin):
     def predict(self, X_pred, return_std=False):
         check_is_fitted(self)
         mean, std = self.gp.predict(X_pred, return_std=return_std)
-        return self.mag_mean + mean, self.err_mean/std
+        return self.mag_mean + mean, std
 
 
 class GeorgeGPWrapper(GPWrapper):
     """A wrapper for the george.GP class."""
 
-    def __init__(self, scale, length_scale):
-        self.kernel = np.exp(scale) * george.kernels.Matern32Kernel(1)
+    def __init__(self, length_scale, period):
+        # periodic kernel
+        self.kernel = george.kernels.ExpSine2Kernel(length_scale, period)
         self.gp = george.GP(self.kernel)
         self.y = np.array([])
 
@@ -95,13 +97,13 @@ class GeorgeGPWrapper(GPWrapper):
         else:
             return pred
 
+
 class TinyGPWrapper(GPWrapper, BaseEstimator, RegressorMixin):
     """A wrapper for the tinygp.GaussianProcess class."""
 
-    def __init__(self, scale, length_scale):
-        self.scale = scale
+    def __init__(self, length_scale, period):
         self.length_scale = length_scale
-        self.period = 1
+        self.period = period
 
     def fit(self, X, y, y_err):
         X, y = check_X_y(X, y)
@@ -110,11 +112,11 @@ class TinyGPWrapper(GPWrapper, BaseEstimator, RegressorMixin):
         self.y_err_ = y_err
 
         def build_gp(params):
-           scale = jnp.exp(params["log_scale"])
-           scale = 1
-           length_scale = jnp.exp(params["log_length_scale"])
-           kernel = scale * scale * tinygp.kernels.ExpSineSquared(gamma=length_scale, scale=self.period)
-           return tinygp.GaussianProcess(kernel, self.X_, diag=self.y_err_**2)
+            length_scale = jnp.exp(params["log_length_scale"])
+            period = jnp.exp(params["log_period"])
+            # periodic kernel
+            kernel = tinygp.kernels.ExpSineSquared(gamma=length_scale, scale=period)
+            return tinygp.GaussianProcess(kernel, self.X_, diag=self.y_err_**2)
 
         @jax.jit
         def neg_log_likelihood(params):
@@ -122,15 +124,15 @@ class TinyGPWrapper(GPWrapper, BaseEstimator, RegressorMixin):
             return -gp.log_probability(self.y_)
 
         params_init = {
-            "log_scale": np.float64(self.scale),
             "log_length_scale": np.float64(self.length_scale),
+            "log_period": np.float64(self.period),
         }
 
         solver = ScipyMinimize(fun=neg_log_likelihood)
         solution = solver.run(params_init)
 
-        self.scale = solution.params["log_scale"]
         self.length_scale = solution.params["log_length_scale"]
+        self.period = solution.params["log_period"]
 
         self.gp = build_gp(solution.params)
         self.is_fitted_ = True
@@ -140,7 +142,6 @@ class TinyGPWrapper(GPWrapper, BaseEstimator, RegressorMixin):
         check_is_fitted(self)
         X_pred = check_array(X_pred)
         pred, pred_var = self.gp.predict(self.y_, X_pred.flatten(), return_var=True)
-        print(f"var entre {pred_var.min()} y {pred_var.max()}")
         if return_std:
             return pred, np.sqrt(pred_var)
         else:
