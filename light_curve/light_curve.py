@@ -137,20 +137,6 @@ class LightCurve:
         self.make_periodic()
 
     """
-    Removes the observations with a signal-to-noise ratio lower than SNR.
-    """
-
-    def filter_snr(self, SNR: float):
-        # 1/magnitude error = flux SNR
-        filtered = np.argwhere(1.0 / self.err >= SNR)
-        self.hjd = self.hjd[filtered]
-        self.mag = self.mag[filtered]
-        self.err = self.err[filtered]
-        self.synth = self.synth[filtered]
-
-        self.dirty = True
-
-    """
     Returns the light curve as a dataframe.
     """
 
