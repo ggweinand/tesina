@@ -19,7 +19,7 @@ class GPWrapper(ABC):
     """An abstract gaussian process regressor class."""
 
     @abstractmethod
-    def __init__(self, length_scale, period):
+    def __init__(self, length_scale):
         pass
 
     @abstractmethod
@@ -34,9 +34,9 @@ class GPWrapper(ABC):
 class ScikitGPWrapper(GPWrapper, BaseEstimator, RegressorMixin):
     """A wrapper for the scikit_learn gaussian process regressor."""
 
-    def __init__(self, length_scale, period):
+    def __init__(self, length_scale):
         self.length_scale = length_scale
-        self.period = period
+        self.period = 0
 
     def fit(self, X, y, y_err):
         self.mag_mean = np.mean(y)
@@ -45,14 +45,12 @@ class ScikitGPWrapper(GPWrapper, BaseEstimator, RegressorMixin):
         # periodic kernel
         length_scale = np.exp(self.length_scale)
         period = np.exp(self.period)
-        kernel = ExpSineSquared(length_scale, period)
+        kernel = ExpSineSquared(length_scale, period, periodicity_bounds="fixed")
         self.gp = GaussianProcessRegressor(kernel=kernel, alpha=y_err**2)
         self.gp.fit(X, y)
 
         params = self.gp.kernel_.theta
-        # TODO: Verify.
         self.length_scale = params[0] / 2
-        self.period = params[1]
         self.is_fitted_ = True
 
         return self.gp
@@ -66,10 +64,11 @@ class ScikitGPWrapper(GPWrapper, BaseEstimator, RegressorMixin):
 class GeorgeGPWrapper(GPWrapper):
     """A wrapper for the george.GP class."""
 
-    def __init__(self, length_scale, period):
+    def __init__(self, length_scale):
         # periodic kernel
-        self.kernel = george.kernels.ExpSine2Kernel(length_scale, period)
+        self.kernel = george.kernels.ExpSine2Kernel(length_scale, 0)
         self.gp = george.GP(self.kernel)
+        self.gp.freeze_parameter("kernel:log_period")
         self.y = np.array([])
 
     def fit(self, X, y, y_err):
@@ -101,9 +100,9 @@ class GeorgeGPWrapper(GPWrapper):
 class TinyGPWrapper(GPWrapper, BaseEstimator, RegressorMixin):
     """A wrapper for the tinygp.GaussianProcess class."""
 
-    def __init__(self, length_scale, period):
+    def __init__(self, length_scale):
         self.length_scale = length_scale
-        self.period = period
+        self.period = 0
 
     def fit(self, X, y, y_err):
         X, y = check_X_y(X, y)
@@ -113,7 +112,7 @@ class TinyGPWrapper(GPWrapper, BaseEstimator, RegressorMixin):
 
         def build_gp(params):
             length_scale = jnp.exp(params["log_length_scale"])
-            period = jnp.exp(params["log_period"])
+            period = jnp.exp(self.period)
             # periodic kernel
             kernel = tinygp.kernels.ExpSineSquared(gamma=length_scale, scale=period)
             return tinygp.GaussianProcess(kernel, self.X_, diag=self.y_err_**2)
@@ -125,14 +124,12 @@ class TinyGPWrapper(GPWrapper, BaseEstimator, RegressorMixin):
 
         params_init = {
             "log_length_scale": np.float64(self.length_scale),
-            "log_period": np.float64(self.period),
         }
 
         solver = ScipyMinimize(fun=neg_log_likelihood)
         solution = solver.run(params_init)
 
         self.length_scale = solution.params["log_length_scale"]
-        self.period = solution.params["log_period"]
 
         self.gp = build_gp(solution.params)
         self.is_fitted_ = True
